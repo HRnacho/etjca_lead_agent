@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0">
+            <div class="sidebar bg-primary text-white vh-100">
+                <div class="text-center py-4">
+                    <i class="fas fa-robot fa-2x mb-2"></i>
+                    <h5>ETJCA Agent</h5>
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white" href="/">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a class="nav-link text-white" href="/search_prospects">
+                        <i class="fas fa-search"></i> Ricerca Prospect
+                    </a>
+                    <a class="nav-link text-white" href="/select_prospects">
+                        <i class="fas fa-user-check"></i> Seleziona Prospect
+                    </a>
+                    <a class="nav-link text-white" href="/reports">
+                        <i class="fas fa-chart-bar"></i> Report
+                    </a>
+                    <a class="nav-link text-white active" href="/settings">
+                        <i class="fas fa-cog"></i> Impostazioni
+                    </a>
+                    <a class="nav-link text-white" href="/logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3">Impostazioni Sistema</h1>
+                    <button class="btn btn-success" onclick="saveAllSettings()">
+                        <i class="fas fa-save"></i> Salva Tutte le Impostazioni
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="engage-tab" data-bs-toggle="tab" data-bs-target="#engage" type="button" role="tab">
+                            <i class="fas fa-link"></i> Engage CRM
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email" type="button" role="tab">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="automation-tab" data-bs-toggle="tab" data-bs-target="#automation" type="button" role="tab">
+                            <i class="fas fa-robot"></i> Automazione
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="templates-tab" data-bs-toggle="tab" data-bs-target="#templates" type="button" role="tab">
+                            <i class="fas fa-file-alt"></i> Template
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="settingsTabsContent">
+                    <!-- Engage CRM Settings -->
+                    <div class="tab-pane fade show active" id="engage" role="tabpanel">
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5><i class="fas fa-link"></i> Configurazione Engage CRM</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="engageForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">URL Engage</label>
+                                                <input type="url" class="form-control" name="engage_url" value="https://career.etjca.it/worker_crm/" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Timeout (secondi)</label>
+                                                <input type="number" class="form-control" name="engage_timeout" value="30">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Username Engage</label>
+                                                <input type="text" class="form-control" name="engage_username" placeholder="Il tuo username Engage">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Password Engage</label>
+                                                <input type="password" class="form-control" name="engage_password" placeholder="La tua password Engage">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Filiale Assegnata</label>
+                                                <select class="form-select" name="engage_filiale">
+                                                    <option value="CERVIGNANO DEL FRIULI" selected>CERVIGNANO DEL FRIULI</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Collega Assegnato</label>
+                                                <select class="form-select" name="engage_collega">
+                                                    <option value="1452 - Sorcaburu Ciglieri Ignacio" selected>1452 - Sorcaburu Ciglieri Ignacio</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-outline-primary" onclick="testEngageConnection()">
+                                            <i class="fas fa-plug"></i> Testa Connessione
+                                        </button>
+                                        <button type="button" class="btn btn-primary" onclick="saveEngageSettings()">
+                                            <i class="fas fa-save"></i> Salva
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Settings -->
+                    <div class="tab-pane fade" id="email" role="tabpanel">
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5><i class="fas fa-envelope"></i> Configurazione Email</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="emailForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Server SMTP</label>
+                                                <input type="text" class="form-control" name="smtp_server" value="smtp.gmail.com">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Porta SMTP</label>
+                                                <input type="number" class="form-control" name="smtp_port" value="587">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Email Utente</label>
+                                                <input type="email" class="form-control" name="email_user" placeholder="ignacio.sorcaburu@etjca.it">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Password Email</label>
+                                                <input type="password" class="form-control" name="email_password" placeholder="App Password">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Nome Mittente</label>
+                                                <input type="text" class="form-control" name="sender_name" value="Ignacio Sorcaburu Ciglieri">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Firma Email</label>
+                                                <input type="text" class="form-control" name="email_signature" value="Account Manager - Friuli Venezia Giulia">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="email_ssl" id="emailSSL" checked>
+                                            <label class="form-check-label" for="emailSSL">
+                                                Usa SSL/TLS
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-outline-primary" onclick="testEmailConnection()">
+                                            <i class="fas fa-envelope"></i> Invia Email di Test
+                                        </button>
+                                        <button type="button" class="btn btn-primary" onclick="saveEmailSettings()">
+                                            <i class="fas fa-save"></i> Salva
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Automation Settings -->
+                    <div class="tab-pane fade" id="automation" role="tabpanel">
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5><i class="fas fa-robot"></i> Impostazioni Automazione</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="automationForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Delay tra azioni (secondi)</label>
+                                                <input type="number" class="form-control" name="action_delay" value="2" min="1" max="10">
+                                                <small class="form-text text-muted">Ritardo tra un'azione e l'altra per evitare blocchi</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Max prospect per sessione</label>
+                                                <input type="number" class="form-control" name="max_prospects" value="20" min="1" max="100">
+                                                <small class="form-text text-muted">Numero massimo di prospect da processare in una volta</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Modalità Browser</label>
+                                                <select class="form-select" name="browser_mode">
+                                                    <option value="headless" selected>Headless (nascosto)</option>
+                                                    <option value="visible">Visibile (debug)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Retry tentativi</label>
+                                                <input type="number" class="form-control" name="retry_attempts" value="3" min="1" max="5">
+                                                <small class="form-text text-muted">Numero di tentativi in caso di errore</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="auto_retry" id="autoRetry" checked>
+                                            <label class="form-check-label" for="autoRetry">
+                                                Riprova automaticamente in caso di errore
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="log_actions" id="logActions" checked>
+                                            <label class="form-check-label" for="logActions">
+                                                Registra tutte le azioni nei log
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="saveAutomationSettings()">
+                                        <i class="fas fa-save"></i> Salva
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Templates Settings -->
+                    <div class="tab-pane fade" id="templates" role="tabpanel">
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5><i class="fas fa-file-alt"></i> Template Email</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="templateForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Oggetto Email</label>
+                                        <input type="text" class="form-control" name="email_subject" value="Collaborazione ETJCA - Servizi per il personale">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Template Email</label>
+                                        <textarea class="form-control" name="email_template" rows="15" placeholder="Scrivi il template email...">Gentile {nome},
+
+sono Ignacio Sorcaburu Ciglieri, Account Manager di ETJCA S.p.A. per la regione Friuli Venezia Giulia.
+
+ETJCA è un'agenzia per il lavoro autorizzata che opera su tutto il territorio nazionale, specializzata nei servizi di ricerca e selezione del personale, somministrazione di lavoro e formazione professionale.
+
+Vorrei presentarle i nostri servizi e discutere di come possiamo supportare la vostra azienda nella gestione delle risorse umane.
+
+Sarebbe possibile fissare un breve incontro per illustrarle le nostre soluzioni personalizzate?
+
+Rimango a disposizione per qualsiasi informazione.
+
+Cordiali saluti,
+
+Ignacio Sorcaburu Ciglieri
+Account Manager - Friuli Venezia Giulia
+ETJCA S.p.A.
+📧 ignacio.sorcaburu@etjca.it
+📱 +39 XXX XXX XXXX
+🌐 www.etjca.it</textarea>
+                                        <small class="form-text text-muted">
+                                            Usa {nome} e {azienda} per personalizzare il messaggio
+                                        </small>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-outline-primary" onclick="previewTemplate()">
+                                            <i class="fas fa-eye"></i> Anteprima
+                                        </button>
+                                        <button type="button" class="btn btn-primary" onclick="saveTemplateSettings()">
+                                            <i class="fas fa-save"></i> Salva Template
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function saveAllSettings() {
+    saveEngageSettings();
+    saveEmailSettings();
+    saveAutomationSettings();
+    saveTemplateSettings();
+}
+
+function saveEngageSettings() {
+    const form = document.getElementById('engageForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch('/api/save_settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Impostazioni Engage salvate!');
+        } else {
+            alert('Errore nel salvataggio');
+        }
+    });
+}
+
+function saveEmailSettings() {
+    const form = document.getElementById('emailForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch('/api/save_settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Impostazioni Email salvate!');
+        } else {
+            alert('Errore nel salvataggio');
+        }
+    });
+}
+
+function saveAutomationSettings() {
+    const form = document.getElementById('automationForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch('/api/save_settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Impostazioni Automazione salvate!');
+        } else {
+            alert('Errore nel salvataggio');
+        }
+    });
+}
+
+function saveTemplateSettings() {
+    const form = document.getElementById('templateForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch('/api/save_settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Template salvato!');
+        } else {
+            alert('Errore nel salvataggio');
+        }
+    });
+}
+
+function testEngageConnection() {
+    alert('Test connessione Engage - Funzione da implementare');
+}
+
+function testEmailConnection() {
+    alert('Test email - Funzione da implementare');
+}
+
+function previewTemplate() {
+    const template = document.querySelector('[name="email_template"]').value;
+    const preview = template.replace('{nome}', 'Mario Rossi').replace('{azienda}', 'Azienda Esempio SRL');
+    
+    const newWindow = window.open('', '_blank', 'width=600,height=400');
+    newWindow.document.write(`
+        <html>
+        <head><title>Anteprima Template</title></head>
+        <body style="font-family: Arial, sans-serif; padding: 20px;">
+            <h3>Anteprima Template Email</h3>
+            <hr>
+            <div style="white-space: pre-wrap;">${preview}</div>
+        </body>
+        </html>
+    `);
+}
+</script>
+{% endblock %}
