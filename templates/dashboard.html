@@ -15,4 +15,318 @@
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
                     <a class="nav-link text-white" href="/search_prospects">
-                        <i class="fas fa
+                        <i class="fas fa-search"></i> Ricerca Prospect
+                    </a>
+                    <a class="nav-link text-white" href="/select_prospects">
+                        <i class="fas fa-user-check"></i> Seleziona Prospect
+                    </a>
+                    <a class="nav-link text-white" href="/reports">
+                        <i class="fas fa-chart-bar"></i> Report
+                    </a>
+                    <a class="nav-link text-white" href="/settings">
+                        <i class="fas fa-cog"></i> Impostazioni
+                    </a>
+                    <a class="nav-link text-white" href="/logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <h1 class="h3 mb-4">Dashboard ETJCA Lead Generation</h1>
+                
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-users fa-2x mb-3"></i>
+                                <h4 id="total-prospects">{{ total_prospects or 0 }}</h4>
+                                <p>Prospect Totali</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-envelope fa-2x mb-3"></i>
+                                <h4 id="emails-sent">{{ emails_sent or 0 }}</h4>
+                                <p>Email Inviate</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-calendar-check fa-2x mb-3"></i>
+                                <h4 id="appointments">{{ appointments_scheduled or 0 }}</h4>
+                                <p>Appuntamenti</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-reply fa-2x mb-3"></i>
+                                <h4 id="responses">{{ responses_received or 0 }}</h4>
+                                <p>Risposte Ricevute</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Recent Activities -->
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-clock"></i> Attività Recenti</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="timeline">
+                                    <div class="timeline-item mb-3">
+                                        <div class="timeline-marker bg-primary"></div>
+                                        <div class="timeline-content">
+                                            <strong>Email inviata</strong> a Mario Rossi (Tech Solutions SRL)
+                                            <small class="text-muted d-block">2 ore fa</small>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item mb-3">
+                                        <div class="timeline-marker bg-success"></div>
+                                        <div class="timeline-content">
+                                            <strong>Appuntamento fissato</strong> con Laura Bianchi (Innovazione SpA)
+                                            <small class="text-muted d-block">4 ore fa</small>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item mb-3">
+                                        <div class="timeline-marker bg-info"></div>
+                                        <div class="timeline-content">
+                                            <strong>Nuova anagrafica</strong> creata per Giuseppe Verdi (Costruzioni Verdi SNC)
+                                            <small class="text-muted d-block">1 giorno fa</small>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item mb-3">
+                                        <div class="timeline-marker bg-warning"></div>
+                                        <div class="timeline-content">
+                                            <strong>Risposta ricevuta</strong> da Anna Ferrari (Digital Marketing Plus)
+                                            <small class="text-muted d-block">2 giorni fa</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-tasks"></i> Azioni Rapide</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary" onclick="window.location.href='/search_prospects'">
+                                        <i class="fas fa-search"></i> Ricerca Nuovi Prospect
+                                    </button>
+                                    <button class="btn btn-outline-primary" onclick="window.location.href='/select_prospects'">
+                                        <i class="fas fa-user-check"></i> Seleziona Prospect
+                                    </button>
+                                    <button class="btn btn-outline-primary" onclick="showAddProspectModal()">
+                                        <i class="fas fa-plus"></i> Aggiungi Manualmente
+                                    </button>
+                                    <button class="btn btn-outline-primary" onclick="window.location.href='/reports'">
+                                        <i class="fas fa-chart-bar"></i> Visualizza Report
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Next Appointments -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5><i class="fas fa-calendar-alt"></i> Prossimi Appuntamenti</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <strong>Oggi 15:00</strong><br>
+                                    Colloquio con Marco Neri<br>
+                                    <small class="text-muted">Logistics Solutions SRL</small>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Domani 10:30</strong><br>
+                                    Presentazione servizi<br>
+                                    <small class="text-muted">Manifattura Friuli SpA</small>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Venerdì 14:00</strong><br>
+                                    Follow-up chiamata<br>
+                                    <small class="text-muted">Food Service Group</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Add Prospect -->
+<div class="modal fade" id="addProspectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Aggiungi Prospect Manualmente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProspectForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nome *</label>
+                                <input type="text" class="form-control" name="nome" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Cognome *</label>
+                                <input type="text" class="form-control" name="cognome" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Azienda *</label>
+                                <input type="text" class="form-control" name="azienda" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Posizione</label>
+                                <input type="text" class="form-control" name="posizione" placeholder="HR Manager">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Telefono</label>
+                                <input type="tel" class="form-control" name="telefono">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Città</label>
+                                <input type="text" class="form-control" name="citta">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Provincia</label>
+                                <select class="form-select" name="provincia">
+                                    <option value="">Seleziona...</option>
+                                    <option value="UD">Udine</option>
+                                    <option value="TS">Trieste</option>
+                                    <option value="PN">Pordenone</option>
+                                    <option value="GO">Gorizia</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Note</label>
+                        <textarea class="form-control" name="note" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-primary" onclick="saveProspect()">Salva Prospect</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -22px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+.timeline-content {
+    padding-left: 10px;
+}
+</style>
+
+<script>
+function showAddProspectModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addProspectModal'));
+    modal.show();
+}
+
+function saveProspect() {
+    const form = document.getElementById('addProspectForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    fetch('/api/add_prospect_manual', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Prospect aggiunto con successo!');
+            bootstrap.Modal.getInstance(document.getElementById('addProspectModal')).hide();
+            location.reload();
+        } else {
+            alert('Errore nel salvataggio del prospect');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Errore nella comunicazione con il server');
+    });
+}
+</script>
+{% endblock %}
