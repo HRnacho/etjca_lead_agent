@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0">
+            <div class="sidebar bg-primary text-white vh-100">
+                <div class="text-center py-4">
+                    <i class="fas fa-robot fa-2x mb-2"></i>
+                    <h5>ETJCA Agent</h5>
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white" href="/">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a class="nav-link text-white" href="/search_prospects">
+                        <i class="fas fa-search"></i> Ricerca Prospect
+                    </a>
+                    <a class="nav-link text-white active" href="/select_prospects">
+                        <i class="fas fa-user-check"></i> Seleziona Prospect
+                    </a>
+                    <a class="nav-link text-white" href="/reports">
+                        <i class="fas fa-chart-bar"></i> Report
+                    </a>
+                    <a class="nav-link text-white" href="/settings">
+                        <i class="fas fa-cog"></i> Impostazioni
+                    </a>
+                    <a class="nav-link text-white" href="/logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3">Seleziona Prospect da Processare</h1>
+                    <button class="btn btn-primary" onclick="processSelectedProspects()">
+                        <i class="fas fa-play"></i> Avvia Processo
+                    </button>
+                </div>
+
+                <!-- Filtri -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-filter"></i> Filtri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <select class="form-select" id="filterSource">
+                                    <option value="">Tutte le fonti</option>
+                                    <option value="LinkedIn">LinkedIn</option>
+                                    <option value="Camera di Commercio">Camera di Commercio</option>
+                                    <option value="Manuale">Manuale</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filterProvincia">
+                                    <option value="">Tutte le province</option>
+                                    <option value="UD">Udine</option>
+                                    <option value="TS">Trieste</option>
+                                    <option value="PN">Pordenone</option>
+                                    <option value="GO">Gorizia</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="filterAzienda" placeholder="Filtra per azienda">
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-primary" onclick="applyFilters()">
+                                    <i class="fas fa-search"></i> Applica Filtri
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Azioni Bulk -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-cogs"></i> Azioni per Prospect Selezionati</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="actionAnagrafica">
+                                    <label class="form-check-label" for="actionAnagrafica">
+                                        <i class="fas fa-user-plus text-primary"></i> Crea Anagrafica
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="actionEmail">
+                                    <label class="form-check-label" for="actionEmail">
+                                        <i class="fas fa-envelope text-success"></i> Invia Email
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="actionAttivita">
+                                    <label class="form-check-label" for="actionAttivita">
+                                        <i class="fas fa-calendar text-info"></i> Registra Attività
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="actionCompleto">
+                                    <label class="form-check-label" for="actionCompleto">
+                                        <i class="fas fa-rocket text-warning"></i> Processo Completo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista Prospect -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-users"></i> Prospect Disponibili</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="selectAll()">
+                                <i class="fas fa-check-square"></i> Seleziona Tutti
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="deselectAll()">
+                                <i class="fas fa-square"></i> Deseleziona Tutti
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th width="50px">
+                                            <input type="checkbox" i
