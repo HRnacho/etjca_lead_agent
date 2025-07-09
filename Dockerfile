@@ -1,46 +1,48 @@
 FROM python:3.9-slim
 
-# Installa dipendenze di sistema
+# Installa dipendenze di sistema necessarie
 RUN apt-get update && apt-get install -y \
     wget \
+    curl \
     gnupg \
     unzip \
-    curl \
-    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
-# Installa Google Chrome
+# Installa Chrome in modo più robusto
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
     && apt-get update \
     && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Installa ChromeDriver
-RUN CHROMEDRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` \
-    && wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip \
-    && unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/ \
+# Installa ChromeDriver compatibile
+RUN CHROME_VERSION=$(google-chrome --version | grep -oE "[0-9]+\.[0-9]+\.[0-9]+") \
+    && CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%%.*}") \
+    && wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip" \
+    && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
     && rm /tmp/chromedriver.zip \
     && chmod +x /usr/local/bin/chromedriver
 
 # Imposta directory di lavoro
 WORKDIR /app
 
-# Copia requirements e installa dipendenze Python
+# Copia e installa dipendenze Python
 COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia codice applicazione
+# Copia tutto il codice
 COPY . .
 
-# Crea directory per database
+# Crea directory necessarie
 RUN mkdir -p /app/data
 
-# Espone porta
-EXPOSE 5000
-
-# Variabile d'ambiente per Chrome
+# Imposta variabili d'ambiente
+ENV PYTHONUNBUFFERED=1
 ENV DISPLAY=:99
 
+# Espone la porta
+EXPOSE 5000
+
 # Comando di avvio
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app", "--timeout", "120", "--workers", "2"]
+CMD ["python", "app.py"]
