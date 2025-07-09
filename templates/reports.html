@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0">
+            <div class="sidebar bg-primary text-white vh-100">
+                <div class="text-center py-4">
+                    <i class="fas fa-robot fa-2x mb-2"></i>
+                    <h5>ETJCA Agent</h5>
+                </div>
+                <nav class="nav flex-column">
+                    <a class="nav-link text-white" href="/">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a class="nav-link text-white" href="/search_prospects">
+                        <i class="fas fa-search"></i> Ricerca Prospect
+                    </a>
+                    <a class="nav-link text-white" href="/select_prospects">
+                        <i class="fas fa-user-check"></i> Seleziona Prospect
+                    </a>
+                    <a class="nav-link text-white active" href="/reports">
+                        <i class="fas fa-chart-bar"></i> Report
+                    </a>
+                    <a class="nav-link text-white" href="/settings">
+                        <i class="fas fa-cog"></i> Impostazioni
+                    </a>
+                    <a class="nav-link text-white" href="/logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3">Report e Statistiche</h1>
+                    <div>
+                        <button class="btn btn-outline-primary" onclick="exportReport()">
+                            <i class="fas fa-download"></i> Esporta Report
+                        </button>
+                        <button class="btn btn-primary" onclick="refreshData()">
+                            <i class="fas fa-sync"></i> Aggiorna
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filtro Periodo -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-calendar-alt"></i> Filtro Periodo</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Da</label>
+                                <input type="date" class="form-control" id="dateFrom">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">A</label>
+                                <input type="date" class="form-control" id="dateTo">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Periodo</label>
+                                <select class="form-select" id="periodSelect">
+                                    <option value="7">Ultimi 7 giorni</option>
+                                    <option value="30" selected>Ultimi 30 giorni</option>
+                                    <option value="90">Ultimi 90 giorni</option>
+                                    <option value="custom">Personalizzato</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-primary d-block" onclick="applyDateFilter()">
+                                    Applica Filtro
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metriche Principali -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <h3>{{ prospects_data|length or 0 }}</h3>
+                                <p>Prospect Trovati</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-envelope fa-2x mb-2"></i>
+                                <h3>{{ emails_data|length or 0 }}</h3>
+                                <p>Email Inviate</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-reply fa-2x mb-2"></i>
+                                <h3>15</h3>
+                                <p>Risposte Ricevute</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                                <h3>{{ appointments_data|length or 0 }}</h3>
+                                <p>Appuntamenti</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grafici -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-line"></i> Trend Prospect</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="prospectsChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-bar"></i> Email Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="emailChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabelle Dettagliate -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-building"></i> Prospect per Provincia</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Provincia</th>
+                                            <th>Prospect</th>
+                                            <th>Contattati</th>
+                                            <th>%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Udine</td>
+                                            <td>45</td>
+                                            <td>23</td>
+                                            <td>51%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Trieste</td>
+                                            <td>32</td>
+                                            <td>18</td>
+                                            <td>56%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pordenone</td>
+                                            <td>28</td>
+                                            <td>15</td>
+                                            <td>54%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Gorizia</td>
+                                            <td>15</td>
+                                            <td>8</td>
+                                            <td>53%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-industry"></i> Prospect per Settore</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Settore</th>
+                                            <th>Prospect</th>
+                                            <th>Risposta</th>
+                                            <th>%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Manifatturiero</td>
+                                            <td>35</td>
+                                            <td>12</td>
+                                            <td>34%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Servizi</td>
+                                            <td>28</td>
+                                            <td>8</td>
+                                            <td>29%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Commercio</td>
+                                            <td>22</td>
+                                            <td>9</td>
+                                            <td>41%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Costruzioni</td>
+                                            <td>18</td>
+                                            <td>6</td>
+                                            <td>33%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attività Recenti -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history"></i> Attività Recenti</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Tipo</th>
+                                        <th>Prospect</th>
+                                        <th>Azienda</th>
+                                        <th>Esito</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>09/07/2025 15:30</td>
+                                        <td><span class="badge bg-primary">Email</span></td>
+                                        <td>Mario Rossi</td>
+                                        <td>Tech Solutions SRL</td>
+                                        <td><span class="badge bg-success">Inviata</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>09/07/2025 14:15</td>
+                                        <td><span class="badge bg-info">Appuntamento</span></td>
+                                        <td>Laura Bianchi</td>
+                                        <td>Innovazione SpA</td>
+                                        <td><span class="badge bg-success">Confermato</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>09/07/2025 11:45</td>
+                                        <td><span class="badge bg-warning">Anagrafica</span></td>
+                                        <td>Giuseppe Verdi</td>
+                                        <td>Costruzioni Verdi SNC</td>
+                                        <td><span class="badge bg-success">Creata</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>08/07/2025 16:20</td>
+                                        <td><span class="badge bg-success">Risposta</span></td>
+                                        <td>Anna Ferrari</td>
+                                        <td>Digital Marketing Plus</td>
+                                        <td><span class="badge bg-success">Ricevuta</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Grafico Prospect
+const prospectsCtx = document.getElementById('prospectsChart').getContext('2d');
+const prospectsChart = new Chart(prospectsCtx, {
+    type: 'line',
+    data: {
+        labels: ['1 Lug', '2 Lug', '3 Lug', '4 Lug', '5 Lug', '6 Lug', '7 Lug'],
+        datasets: [{
+            label: 'Prospect Trovati',
+            data: [5, 8, 12, 15, 18, 22, 25],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Grafico Email
+const emailCtx = document.getElementById('emailChart').getContext('2d');
+const emailChart = new Chart(emailCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Inviate', 'Aperte', 'Risposte', 'Appuntamenti'],
+        datasets: [{
+            label: 'Email Performance',
+            data: [45, 32, 15, 8],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)'
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+function refreshData() {
+    location.reload();
+}
+
+function exportReport() {
+    alert('Funzione di esportazione non ancora implementata');
+}
+
+function applyDateFilter() {
+    const period = document.getElementById('periodSelect').value;
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
+    
+    // Implementa logica filtro date
+    alert('Filtro date applicato: ' + period + ' giorni');
+}
+
+// Imposta data di default
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+    
+    document.getElementById('dateTo').valueAsDate = today;
+    document.getElementById('dateFrom').valueAsDate = thirtyDaysAgo;
+});
+</script>
+{% endblock %}
